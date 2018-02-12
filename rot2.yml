@@ -1,0 +1,39 @@
+# Config file for GUV_w.py
+rootname    : test2
+date        : 01-23-18 # day-month-year
+type        : transfer
+mscope:
+    model: nikon
+    obj  : 40x
+    dt   : 1 
+    channels:
+        # Description of image channels
+        ch1 : NBD
+        ch2 : rhodamine
+sol_content:
+    # Description of outer/inner solution content
+    outside: Tris-HCL-Glu 200 mM
+    inside: Sucrose 200 mM
+pipette: 
+    # Pipette diameter, with upper/lower error (um) 
+    diameter: 12.5
+vesicle :
+    # Vesicle diameter, with upper/lower error (um)
+    diameter: 33
+    comp:
+        # Vesicle content by mol percent
+        DOPC   : 69
+        DOPG   : 30
+        rh-DOPE: 1 
+tension:
+    # Tension series => tension pull: time (mm: s)
+    - 10: 0
+    - 20: 30
+    - 30: 60
+    - 40: 90
+calc:
+    # Details for image manipulations
+    c_int: 3000 
+    canny_lo: 150
+    canny_hi: 300
+    pix_err: 0
