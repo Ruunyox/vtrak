@@ -1,4 +1,4 @@
-#! /usr/local/bin/python3
+#! /usr/bin/env python
 
 import os
 import sys
@@ -50,6 +50,7 @@ if sys.platform == "win32":
             app = wx.App(None)
             style = wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE
             dialog = wx.FileDialog(None, 'Open',wildcard='*.tif',style=style)
+            dialog.SetDirectory('.')
             mult = None
             if dialog.ShowModal() == wx.ID_OK:
                 try:
@@ -336,47 +337,48 @@ def area_routine(config):
 	return data
 
 #### MAIN ####
+def __main__():
+    if '--fs' not in sys.argv:
+        config = exp_param(root=str(sys.argv[-1]).split('.')[0])
+        progress = pbar()
+        data = area_routine(config)
 
-if '--fs' not in sys.argv:
-    config = exp_param(root=str(sys.argv[-1]).split('.')[0])
-    progress = pbar()
-    data = area_routine(config)
+        plt.plot(data.time,data.relative_area,'o',markersize=4)
+        plt.title(data.params.root)
+        plt.xlabel('Time [s]')
+        plt.ylabel('Relative Area Change '+r'$\left(\frac{\Delta A}{A}\right) \%$')
+        plt.savefig(data.params.root+"_area.pdf")
+        plt.show()
 
-    plt.plot(data.time,data.relative_area,'o',markersize=4)
-    plt.title(data.params.root)
-    plt.xlabel('Time [s]')
-    plt.ylabel('Relative Area Change '+r'$\left(\frac{\Delta A}{A}\right) \%$')
-    plt.savefig(data.params.root+"_area.pdf")
-    plt.show()
+    if '--fs' in sys.argv:
+        progress = pbar()
+        inputfiles = fs()
+        if len(inputfiles) != 1:
+           datalist = []
+           for i in range(len(inputfiles)):
+             config = exp_param(root=str(inputfiles[i]).split('.')[0])
+             data = area_routine(config)
+             datalist.append(data)
+           
+           plt.figure('Multiple Vesicle Analysis')
+           print("\nEnter Plot title: ",end="")
+           TITLE = input()   
+           plt.title(str(TITLE))
+           for i,data in enumerate(datalist):
+             plt.plot(data.time,data.relative_area,'o',markersize=4)
+           plt.xlabel('Time [s]')    
+           plt.ylabel('Relative Area Change '+r'$\left(\frac{\Delta A}{A}\right) \%$')
+           if TITLE != '':
+             plt.savefig(TITLE+"_area.pdf")
+           plt.show()
+        else:
+           config = exp_param(root=str(inputfiles[0]).split('.')[0])
+           data = area_routine(config)
 
-if '--fs' in sys.argv:
-    progress = pbar()
-    inputfiles = fs()
-    if len(inputfiles) != 1:
-       datalist = []
-       for i in range(len(inputfiles)):
-         config = exp_param(root=str(inputfiles[i]).split('.')[0])
-         data = area_routine(config)
-         datalist.append(data)
-       
-       plt.figure('Multiple Vesicle Analysis')
-       print("\nEnter Plot title: ",end="")
-       TITLE = input()   
-       plt.title(str(TITLE))
-       for i,data in enumerate(datalist):
-         plt.plot(data.time,data.relative_area,'o',markersize=4)
-       plt.xlabel('Time [s]')    
-       plt.ylabel('Relative Area Change '+r'$\left(\frac{\Delta A}{A}\right) \%$')
-       if TITLE != '':
-         plt.savefig(TITLE+"_area.pdf")
-       plt.show()
-    else:
-       config = exp_param(root=str(inputfiles[0]).split('.')[0])
-       data = area_routine(config)
-
-       plt.plot(data.time,data.relative_area,'o',markersize=4)
-       plt.title(data.params.root)
-       plt.xlabel('Time [s]')
-       plt.ylabel('Relative Area Change '+r'$\left(\frac{\Delta A}{A}\right) \%$')
-       plt.savefig(data.params.root+"_area.pdf")
-       plt.show()
+           plt.plot(data.time,data.relative_area,'o',markersize=4)
+           plt.title(data.params.root)
+           plt.xlabel('Time [s]')
+           plt.ylabel('Relative Area Change '+r'$\left(\frac{\Delta A}{A}\right) \%$')
+           plt.savefig(data.params.root+"_area.pdf")
+           plt.show()
+__main__()
