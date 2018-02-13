@@ -170,9 +170,9 @@ class vesicleData:
          ves_r = math.ceil(self.params.ves['diameter']*self.params.um2pix/2)+err
          circles = {'vesicle':[],'protrusion':[]}
          for i in range(round(len(self.overlay))):
-          if progress:
+          if bar:
               percent = round(100*float(i/len(self.imgstack)))
-              progress.update(pcent=percent)
+              bar.update(pcent=percent)
           filt = canny(self.overlay[i],sigma=2,\
                  low_threshold=self.params.calc['canny_lo'],\
                  high_threshold=self.params.calc['canny_hi'])
@@ -324,7 +324,7 @@ class pbar:
          sub = round(pcent*self.length/100)
          print((self.marker*sub)+(" "*(self.length-sub))+self.rm,end="\r"+self.lm)
 
-def area_routine(config):
+def area_routine(config,progress):
 	data = vesicleData(params=config)
 	data.load_stack()
 	data.gen_circles(bar=progress)
@@ -341,7 +341,7 @@ def __main__():
     if '--fs' not in sys.argv:
         config = exp_param(root=str(sys.argv[-1]).split('.')[0])
         progress = pbar()
-        data = area_routine(config)
+        data = area_routine(config,progress)
 
         plt.plot(data.time,data.relative_area,'o',markersize=4)
         plt.title(data.params.root)
@@ -357,7 +357,7 @@ def __main__():
            datalist = []
            for i in range(len(inputfiles)):
              config = exp_param(root=str(inputfiles[i]).split('.')[0])
-             data = area_routine(config)
+             data = area_routine(config,progress)
              datalist.append(data)
            
            plt.figure('Multiple Vesicle Analysis')
@@ -373,7 +373,7 @@ def __main__():
            plt.show()
         else:
            config = exp_param(root=str(inputfiles[0]).split('.')[0])
-           data = area_routine(config)
+           data = area_routine(config,progress)
 
            plt.plot(data.time,data.relative_area,'o',markersize=4)
            plt.title(data.params.root)
